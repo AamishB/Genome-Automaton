@@ -48,13 +48,14 @@ class NFA(BaseAutomaton):
         self.current_states: Set[int] = set()
         self.reset()
 
-    # ----- Construction helpers -----
     def _new_state(self) -> int:
+        """Create and return a new state ID."""
         s = self._next_state_id
         self._next_state_id += 1
         return s
 
     def _add_edge(self, u: int, sym: str, v: int):
+        """Add a transition edge from state u to state v on symbol sym."""
         self.transitions.setdefault((u, sym), set()).add(v)
 
     def _build_graph(self) -> None:
@@ -111,42 +112,34 @@ class NFA(BaseAutomaton):
     def get_important_restart_edges(self) -> Set[Tuple[int, str]]:
         return set(self._final_return_edges)
 
-    # ------------- Engine API -------------
     def reset(self) -> None:
+        """Reset to initial state."""
         self.current_states = {0}
 
     def step(self, symbol: str):
+        """Process one symbol and update states."""
         symbol = symbol.upper()
         prev = set(self.current_states)
-
-        # Start new attempts from Q0 and advance from all current states
-        candidates = set(prev)
-        candidates.add(0)
-
+        candidates = prev | {0}
+        
         next_states: Set[int] = set()
         matched_now = False
 
         for u in candidates:
             for v in self.transitions.get((u, symbol), set()):
                 next_states.add(v)
-                # Detect final return (full motif completed on this symbol)
                 if (u, symbol) in self._final_return_edges or (v == 0 and u != 0):
                     matched_now = True
 
-        # Always keep Q0 available to continue scanning even if no edges fired
-        if not next_states:
-            next_states = {0}
-
-        self.current_states = next_states
-
-        # Description string
-        def fmt(states: Set[int]) -> str:
-            return "{" + ", ".join(f"Q{s}" for s in sorted(states)) + "}"
-
-        desc = f"Read '{symbol}': {fmt(prev)} → {fmt(self.current_states)}"
-        if matched_now:
-            desc += " [MATCH]"
+        self.current_states = next_states if next_states else {0}
+        desc = self._format_states(prev, symbol, matched_now)
         return self.current_states, matched_now, desc
+    
+    def _format_states(self, prev: Set[int], symbol: str, matched: bool) -> str:
+        """Format state transition description."""
+        fmt = lambda s: "{" + ", ".join(f"Q{i}" for i in sorted(s)) + "}"
+        desc = f"Read '{symbol}': {fmt(prev)} → {fmt(self.current_states)}"
+        return desc + " [MATCH]" if matched else desc
 
     def get_state_description(self, state) -> str:
         if not state:

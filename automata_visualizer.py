@@ -617,41 +617,9 @@ class AutomataVisualizer(QWidget):
 
     def _state_index(self, state):
         """Map arbitrary state objects to a stable index for node placement."""
-        # For consistent layout across runs, index by enumeration order
         if not hasattr(self, '_state_index_map'):
             self._state_index_map = {}
         key = state
         if key not in self._state_index_map:
             self._state_index_map[key] = len(self._state_index_map)
         return self._state_index_map[key]
-
-    # ----- Hover focus handling -----
-    def _nearest_state_under(self, pos):
-        # Find closest node center within radius threshold
-        try:
-            for state in self._ordered_states(self._safe_get_states()):
-                idx = self._state_index(state)
-                p = self.state_positions.get(idx)
-                if not p:
-                    continue
-                dist2 = (pos.x() - p.x())**2 + (pos.y() - p.y())**2
-                r = max(20, int(self.node_radius * self._zoom))
-                if dist2 <= (r*1.2)**2:
-                    return state
-        except Exception:
-            pass
-        return None
-
-    def mouseMoveEvent(self, event):
-        # Keep panning behavior if dragging
-        if self._dragging and self._last_mouse_pos is not None:
-            delta = event.pos() - self._last_mouse_pos
-            self._pan += QPointF(delta.x(), delta.y())
-            self._last_mouse_pos = event.pos()
-            self.update()
-            return
-        # Hover highlighting
-        st = self._nearest_state_under(event.pos())
-        if st != self._hover_state:
-            self._hover_state = st
-            self.update()

@@ -37,26 +37,30 @@ python main.py
 ## 📖 Usage Guide
 
 1. **Enter DNA Sequence**
+
    - Type a DNA sequence manually (e.g., `ATGATGCTAGCTAA`)
    - Or click "Generate Random DNA" for a test sequence
 
 2. **Pick Automaton Type + Pattern**
-    - Choose one from the Automaton Type dropdown:
-       - DFA – exact literal (e.g., `ATG`, `GAATTC`)
-       - NFA – alternatives with `|` (e.g., `ATG|TAA|TGA`)
-       - ε-NFA – spacer ranges with `{min,max}` (e.g., `TATA{1,10}TATA`)
-       - PDA – finds reverse-complement palindromes (pattern field ignored)
-    - Common patterns:
-       - `ATG` - Start codon (translation initiation)
-       - `TAA`, `TAG`, `TGA` - Stop codons
-       - `TATA{1,10}TATA` - Promoter-like box with flexible spacing
-       - `GAATTC` - EcoRI restriction site
+
+   - Choose one from the Automaton Type dropdown:
+     - DFA – exact literal (e.g., `ATG`, `GAATTC`)
+     - NFA – alternatives with `|` (e.g., `ATG|TAA|TGA`)
+     - ε-NFA – spacer ranges with `{min,max}` (e.g., `TATA{1,10}TATA`)
+     - PDA – finds reverse-complement palindromes (pattern field ignored)
+   - Common patterns:
+     - `ATG` - Start codon (translation initiation)
+     - `TAA`, `TAG`, `TGA` - Stop codons
+     - `TATA{1,10}TATA` - Promoter-like box with flexible spacing
+     - `GAATTC` - EcoRI restriction site
 
 3. **Build Automaton**
+
    - Click "Build Automaton" to generate the DFA
    - View the state diagram showing all states and transitions
 
 4. **Run Simulation**
+
    - Click "Run Simulation" to start pattern detection
    - Watch as the automaton processes each base
    - Matched patterns are highlighted in green
@@ -92,6 +96,7 @@ automata_genetic_analysis/
 ### Module Overview
 
 #### `automata_engine.py`
+
 - **DFA Class**: Implements deterministic finite automaton
 - **Pattern Matching Logic**: Uses KMP-inspired failure function for efficient state transitions
 - **State Management**: Tracks current state and accepts states
@@ -99,19 +104,23 @@ automata_genetic_analysis/
 - Provides biological context descriptions for each state
 
 #### `nfa_engine.py`
+
 - NFA over alternatives like `ATG|TAA|TGA`
 - Tracks a set of active states and advances in parallel
 - Works with the shared visualization adapter
 
 #### `enfa_engine.py`
+
 - ε-NFA that matches `HEAD{min,max}TAIL` patterns (e.g., `TATA{1,10}TATA`)
 - Nondeterministic spacer length; deterministic matcher for results
 
 #### `pda_engine.py`
+
 - PDA that detects reverse-complement palindromes (hairpin-like)
 - Efficient center expansion for matches; light step() logs for visuals
 
 #### `dna_visualizer.py`
+
 - **DNAVisualizer Widget**: Custom PyQt widget for DNA rendering
 - **Color Coding**: Maps bases to distinct colors (A=Red, T=Blue, G=Green, C=Yellow)
 - **Scrolling Animation**: Auto-scrolls to keep current base visible
@@ -119,6 +128,7 @@ automata_genetic_analysis/
 - **Real-time Updates**: Smooth animations as bases are processed
 
 #### `automata_visualizer.py`
+
 - **AutomataVisualizer Widget**: Renders DFA state diagram
 - **Circular Layout**: Arranges states in visually pleasing circle/ellipse
 - **Transition Arrows**: Shows all possible state transitions with labels
@@ -127,6 +137,7 @@ automata_genetic_analysis/
 - **Active Transition**: Highlights the transition being taken
 
 #### `ui_layout.py`
+
 - **MainWindow Class**: Orchestrates all components
 - **Three-Panel Layout**: Left (input), Center (visualization), Right (info)
 - **Automaton Type Selector**: Build DFA/NFA/ε-NFA/PDA via factory
@@ -135,6 +146,7 @@ automata_genetic_analysis/
 - **Status Updates**: Real-time feedback on simulation progress
 
 #### `assets/theme.qss`
+
 - **Biotech Aesthetic**: Dark background (#1A1F2E) with neon accents
 - **Color Scheme**: Cyan (#00D9FF), Green (#00FFAA) highlights
 - **Gradients**: Subtle gradients for depth and polish
@@ -196,31 +208,28 @@ This approach mirrors how molecular machinery "reads" DNA sequences to find func
 
 ## 📝 Example Patterns to Try
 
-| Pattern | Biological Significance | Expected Behavior |
-|---------|------------------------|-------------------|
-| `ATG` | Start codon | Marks protein start |
-| `TAA` | Stop codon | Terminates translation |
-| `TATA` | TATA box | Promoter region |
-| `GAATTC` | EcoRI site | Restriction enzyme cut site |
-| `CG` | CpG island | Regulatory region marker |
+| Pattern  | Biological Significance | Expected Behavior           |
+| -------- | ----------------------- | --------------------------- |
+| `ATG`    | Start codon             | Marks protein start         |
+| `TAA`    | Stop codon              | Terminates translation      |
+| `TATA`   | TATA box                | Promoter region             |
+| `GAATTC` | EcoRI site              | Restriction enzyme cut site |
+| `CG`     | CpG island              | Regulatory region marker    |
 
-## 🤝 Contributing
+## � Future Enhancements
 
-This is an educational project. Feel free to:
-- Add new genetic patterns
-- Enhance visualizations
-- Improve animations
-- Add more biological context
-- Optimize performance
+- Export state diagrams as images
+- Save/load DNA sequences and patterns
+- Additional pattern types (regex support)
+- Performance metrics (time, memory usage)
+- Multiple sequence alignment support
+- Export match results to CSV/JSON
 
-## 📄 License
+## �📄 License
 
 Free for educational and academic use.
 
 ## 👨‍💻 Author
 
-Developed as a demonstration of combining Computer Science theory with Biological applications.
-
----
-
-**Built with ❤️ for Science and Education**
+**AamishB**  
+Repository: [Genome-Automaton](https://github.com/AamishB/Genome-Automaton)

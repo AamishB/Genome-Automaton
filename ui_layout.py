@@ -123,8 +123,6 @@ class MainWindow(QMainWindow):
         layout.setSpacing(15)
         layout.setContentsMargins(15, 15, 15, 15)
         
-        # (Automaton Type section moved below Pattern section)
-
         # DNA Input Section
         dna_label = QLabel("DNA Sequence:")
         dna_label.setFont(QFont('Segoe UI', 11, QFont.Bold))
@@ -153,7 +151,6 @@ class MainWindow(QMainWindow):
         self.pattern_input.setPlaceholderText("DFA: ATG | NFA: ATG|TAA | ε-NFA: TATA{1,10}TATA | PDA: (ignored)")
         self.pattern_input.setFont(QFont('Consolas', 12))
         layout.addWidget(self.pattern_input)
-        # (Helper/placeholder will be initialized after automaton type widgets are created)
         
         # Example patterns
         examples_label = QLabel("Common patterns:\n• DFA: ATG (start)\n• NFA: ATG|TAA|TGA (alts)\n• ε-NFA: TATA{1,10}TATA (spacer)\n• PDA: finds complement palindromes")
@@ -161,7 +158,7 @@ class MainWindow(QMainWindow):
         examples_label.setFont(QFont('Segoe UI', 9))
         layout.addWidget(examples_label)
 
-        # Automaton Type section (styled like Simulation Speed buttons) — placed after Pattern
+        # Automaton Type section
         type_label = QLabel("Automaton Type:")
         type_label.setFont(QFont('Segoe UI', 11, QFont.Bold))
         layout.addWidget(type_label)
@@ -170,14 +167,12 @@ class MainWindow(QMainWindow):
         self.type_group = QButtonGroup(self)
         self.type_group.setExclusive(True)
 
-        def add_type_btn(text, atype, tooltip=None):
+        def add_type_btn(text, atype, tooltip=""):
             btn = QPushButton(text)
             btn.setCheckable(True)
             btn.setFixedHeight(40)
-            # Reuse speed button styling for visual consistency
             btn.setObjectName("speedBtn")
-            if tooltip:
-                btn.setToolTip(tooltip)
+            btn.setToolTip(tooltip)
             btn.setProperty('atype', atype)
             self.type_group.addButton(btn)
             type_layout.addWidget(btn)
@@ -407,27 +402,19 @@ class MainWindow(QMainWindow):
         pattern = self.pattern_input.text().strip().upper()
         atype = self.selected_type
 
-        # For DFA/NFA/ENFA, validate characters only when a pattern is required
         if atype in (AutomataType.DFA, AutomataType.NFA, AutomataType.ENFA):
             if not pattern:
                 QMessageBox.warning(self, "Input Error", "Please enter a pattern to detect.")
                 return
-            # ENFA allows braces and comma; validate broadly except those
-            valid_bases = set('ATGC')
+            
             if atype == AutomataType.ENFA:
-                # Strip the {m,n} part for a soft check of bases around
-                base_only = ''.join([c for c in pattern if c in 'ATGC{}.,0123456789'])
-                if not base_only:
+                if not any(c in pattern for c in '{}'):
                     QMessageBox.warning(self, "Input Error", "Invalid ε-NFA pattern.")
                     return
-            elif atype in (AutomataType.DFA, AutomataType.NFA):
-                alt_str = pattern.replace('|', '')
-                if not all(c in valid_bases for c in alt_str):
-                    QMessageBox.warning(self, "Input Error",
-                                        "Pattern must contain only A, T, G, C (and '|' for NFA).")
-                    return
+            elif not all(c in 'ATGC|' for c in pattern.replace('|', '')):
+                QMessageBox.warning(self, "Input Error", "Pattern must contain only A, T, G, C (and '|' for NFA).")
+                return
 
-        # Build engine via factory
         try:
             self.engine = create_automaton(atype, pattern)
             self.engine_type = atype
@@ -435,8 +422,15 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Build Failed", f"Could not build automaton: {e}")
             return
 
-        # Update visualizers
-        if atype == AutomataType.PDA:
+        self._update_visualizers()
+        self._update_status(pattern)
+
+        label = next((lbl for (t, lbl) in available_types() if t == self.selected_type), self.selected_type)
+        QMessageBox.information(self, "Success", f"Automaton generated successfully!\nType: {label}\nPattern: {pattern or '(n/a)'}")
+    
+    def _update_visualizers(self):
+        """Update visualizers after building automaton."""
+        if self.engine_type == AutomataType.PDA:
             self.pda_viz.setVisible(True)
             self.pda_viz.set_automaton(self.engine)
             self.automata_viz.setVisible(False)
@@ -445,64 +439,60 @@ class MainWindow(QMainWindow):
             self.automata_viz.setVisible(True)
             self.automata_viz.set_automaton(self.engine)
 
-        # Reset displays
         self.dna_viz.reset()
         self.transition_log.clear()
         self.results_display.clear()
-
-        # Update status
+    
+    def _update_status(self, pattern):
+        """Update status labels after building automaton."""
         label = next((lbl for (t, lbl) in available_types() if t == self.selected_type), self.selected_type)
         self.status_label.setText(f"Built: {label}")
         try:
-            # Use engine's description API
             desc = self.engine.get_state_description(getattr(self.engine, 'current_state', 0))
         except Exception:
             desc = "Ready"
         self.current_state_label.setText(desc)
-
-        QMessageBox.information(self, "Success",
-                                f"Automaton generated successfully!\nType: {label}\nPattern: {pattern or '(n/a)'}")
     
     def _run_simulation(self):
         """Start simulation animation."""
         if not self.engine:
-            QMessageBox.warning(self, "No Automaton",
-                              "Please build an automaton first.")
+            QMessageBox.warning(self, "No Automaton", "Please build an automaton first.")
             return
         
         dna_sequence = self.dna_input.toPlainText().strip().upper().replace(" ", "").replace("\n", "")
         
         if not dna_sequence:
-            QMessageBox.warning(self, "Input Error",
-                              "Please enter a DNA sequence.")
+            QMessageBox.warning(self, "Input Error", "Please enter a DNA sequence.")
             return
         
-        # Validate DNA sequence
-        valid_bases = set('ATGC')
-        if not all(c in valid_bases for c in dna_sequence):
-            QMessageBox.warning(self, "Input Error",
-                              "DNA sequence must contain only A, T, G, C bases.")
+        if not all(c in 'ATGC' for c in dna_sequence):
+            QMessageBox.warning(self, "Input Error", "DNA sequence must contain only A, T, G, C bases.")
             return
         
-        # Setup simulation
+        self._setup_simulation(dna_sequence)
+    
+    def _setup_simulation(self, dna_sequence):
+        """Setup and start simulation."""
         try:
             self.engine.reset()
         except Exception:
             pass
+        
         self.simulation_index = 0
+        self._highlighted_matches = set()
         self.dna_viz.set_dna_sequence(dna_sequence)
         self.dna_viz.clear_matches()
+        
         if self.engine_type != AutomataType.PDA:
             self.automata_viz.reset()
+        
         self.transition_log.clear()
         self.results_display.clear()
         
-        # Update UI
         self.btn_run.setEnabled(False)
         self.btn_pause.setEnabled(True)
         self.status_label.setText("Simulation running...")
         
-        # Start animation timer
         self.simulation_timer = QTimer()
         self.simulation_timer.timeout.connect(self._simulation_step)
         self.simulation_timer.start(self.simulation_speed)
@@ -565,15 +555,31 @@ class MainWindow(QMainWindow):
         self.transition_log.verticalScrollBar().setValue(
             self.transition_log.verticalScrollBar().maximum())
         
-        # If match found, highlight only for DFA (NFA/ENFA/PDA finalized later)
-        if is_accepting and self.engine_type == AutomataType.DFA:
+        # Highlight matches during simulation for all automata types
+        if is_accepting:
             try:
-                pat_len = len(getattr(self.engine, 'pattern', ''))
-                start = self.simulation_index - pat_len + 1
-                end = self.simulation_index
-                self.dna_viz.add_match(start, end)
-                result_text = f"✓ Match found at positions {start}-{end}\n"
-                self.results_display.append(result_text)
+                # For all automata types, we need to compute the match position
+                # Get all matches up to current position
+                dna_sequence = self.dna_input.toPlainText().strip().upper().replace(" ", "").replace("\n", "")
+                current_matches = self.engine.find_all_matches(dna_sequence[:self.simulation_index + 1])
+                
+                # Find matches that end at current position
+                for start, end in current_matches:
+                    if end == self.simulation_index:
+                        # Check if this match hasn't been highlighted yet
+                        already_highlighted = False
+                        for existing_match in getattr(self, '_highlighted_matches', set()):
+                            if existing_match == (start, end):
+                                already_highlighted = True
+                                break
+                        
+                        if not already_highlighted:
+                            self.dna_viz.add_match(start, end)
+                            if not hasattr(self, '_highlighted_matches'):
+                                self._highlighted_matches = set()
+                            self._highlighted_matches.add((start, end))
+                            result_text = f"✓ Match found at positions {start}-{end}\n"
+                            self.results_display.append(result_text)
             except Exception:
                 pass
         

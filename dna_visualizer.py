@@ -124,21 +124,6 @@ class DNAVisualizer(QWidget):
         self.show_glow = not self.show_glow
         self.update()
     
-    def toggle_complement(self):
-        """Toggle complementary strand display."""
-        self.show_complement = not self.show_complement
-        self.update()
-    
-    def toggle_grid(self):
-        """Toggle grid background."""
-        self.show_grid = not self.show_grid
-        self.update()
-    
-    def toggle_codon_frames(self):
-        """Toggle codon frame highlighting."""
-        self.show_codon_frames = not self.show_codon_frames
-        self.update()
-    
     def _create_particle_burst(self, index):
         """Create particle effect at base position."""
         base_color = self.BASE_COLORS.get(self.dna_sequence[index], QColor(100, 100, 100))

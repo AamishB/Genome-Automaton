@@ -4,10 +4,11 @@ Defines a lightweight base class and an enum-like type string for different
 automata so the UI can work with any engine in a uniform way.
 """
 
-from typing import Any, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Any, List, Tuple
 
 
 class AutomataType:
+    """Constants for different automata types."""
     DFA = "DFA"
     NFA = "NFA"
     ENFA = "Epsilon-NFA"
@@ -24,21 +25,24 @@ class BaseAutomaton:
     - get_state_description(state_or_states) -> str
     """
 
-    alphabet: Sequence[str] = ("A", "T", "G", "C")
+    alphabet = ("A", "T", "G", "C")
 
     def __init__(self, pattern: str, automata_type: str):
         self.pattern = (pattern or "").upper()
         self.automata_type = automata_type
 
-    # --- Virtuals ---
-    def reset(self) -> None:  # pragma: no cover - interface only
+    def reset(self) -> None:
+        """Reset automaton to initial state."""
         raise NotImplementedError
 
-    def step(self, symbol: str) -> Tuple[Any, bool, str]:  # pragma: no cover
+    def step(self, symbol: str) -> Tuple[Any, bool, str]:
+        """Process one symbol and return (new_state, is_accepting, description)."""
         raise NotImplementedError
 
-    def find_all_matches(self, sequence: str) -> List[Tuple[int, int]]:  # pragma: no cover
+    def find_all_matches(self, sequence: str) -> List[Tuple[int, int]]:
+        """Find all pattern matches in the sequence."""
         raise NotImplementedError
 
-    def get_state_description(self, state: Any) -> str:  # pragma: no cover
+    def get_state_description(self, state: Any) -> str:
+        """Get a human-readable description of the state."""
         raise NotImplementedError

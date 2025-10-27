@@ -26,37 +26,39 @@ class PDA(BaseAutomaton):
         self.mode = "push"  # UI-friendly label; not a formal construction here
 
     def reset(self) -> None:
+        """Reset PDA state."""
         self.stack.clear()
         self.pos = 0
         self.mode = "push"
 
-    # Visualization helpers
     def get_type(self):
+        """Return automaton type."""
         return AutomataType.PDA
 
     def get_stack(self):
+        """Return current stack."""
         return list(self.stack)
 
     def get_control_state(self):
+        """Return current control state."""
         return self.mode
 
     def step(self, symbol: str):
-        # For logging only: push current symbol; periodically pop to simulate
-        # comparison when stack is large. This keeps the transition log
-        # informative without constraining actual detection.
+        """Process one symbol (for visualization only)."""
         symbol = symbol.upper()
         before = list(self.stack)
-        action = "PUSH"
         self.stack.append(symbol)
         self.pos += 1
-        if len(self.stack) > 8:  # arbitrary pop phase for demo visuals
+        
+        action = "PUSH"
+        if len(self.stack) > 8:
             self.mode = "pop"
             self.stack.pop(0)
             action = "SHIFT"
         else:
             self.mode = "push"
+        
         desc = f"Read '{symbol}': mode={self.mode}, {action}, stack={''.join(before)}→{''.join(self.stack)}"
-        # Acceptance is not determined incrementally here
         return (self.mode, False, desc)
 
     def get_state_description(self, state) -> str:

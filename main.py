@@ -11,20 +11,17 @@ from ui_layout import MainWindow
 
 def main():
     """Initialize and run the application."""
-    # Enable high DPI scaling for better display on modern screens
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
     
     app = QApplication(sys.argv)
     
-    # Load custom stylesheet
     try:
         with open('assets/theme.qss', 'r') as f:
             app.setStyleSheet(f.read())
     except FileNotFoundError:
         print("Warning: theme.qss not found. Using default styling.")
     
-    # Create and show main window
     window = MainWindow()
     window.show()
     

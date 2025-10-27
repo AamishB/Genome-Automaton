@@ -49,36 +49,39 @@ class EpsilonNFA(BaseAutomaton):
         self.current_states: Set[ENFAState] = set()
         self.reset()
 
-    # ----- Visualization adapter -----
     def get_type(self):
+        """Return automaton type."""
         return AutomataType.ENFA
 
     def get_states(self) -> List[ENFAState]:
+        """Return all states."""
         states: List[ENFAState] = []
-        # head
         for k in range(len(self.head) + 1):
             states.append(ENFAState("head", k))
-        # spacer
         for g in range(self.max_gap + 1):
             states.append(ENFAState("spacer", g))
-        # tail
         for k in range(len(self.tail) + 1):
             states.append(ENFAState("tail", k))
         return states
 
     def get_initial_states(self):
+        """Return initial states."""
         return {ENFAState("head", 0)}
 
     def get_accept_states(self):
+        """Return accepting states."""
         return {ENFAState("tail", len(self.tail))}
 
     def get_current_states(self):
+        """Return current states."""
         return set(self.current_states)
 
     def get_symbol_set(self):
+        """Return alphabet symbols."""
         return list(self.alphabet)
 
     def get_state_label(self, state: ENFAState):
+        """Return state label."""
         return f"{state.phase}:{state.k}"
 
     def get_transitions(self):
@@ -109,12 +112,11 @@ class EpsilonNFA(BaseAutomaton):
         return trans
 
     def reset(self) -> None:
-        # Start at head progress 0 and also allow epsilon to restart head at any time
+        """Reset to initial state."""
         self.current_states = {ENFAState("head", 0)}
 
     def _epsilon_closure(self, states: Set[ENFAState]) -> Set[ENFAState]:
-        # In this simplified model we only add the ability to always (re)start matching
-        # from the head via epsilon.
+        """Compute epsilon closure of states."""
         closure = set(states)
         closure.add(ENFAState("head", 0))
         return closure
@@ -147,14 +149,14 @@ class EpsilonNFA(BaseAutomaton):
 
         self.current_states = self._epsilon_closure(next_states)
         accepting = any(st.phase == "tail" and st.k == len(self.tail) for st in self.current_states)
-
-        def fmt(states: Set[ENFAState]) -> str:
-            return "{" + ", ".join(f"{s.phase}:{s.k}" for s in sorted(states, key=lambda x:(x.phase,x.k))) + "}"
-
-        desc = f"Read '{symbol}': {fmt(prev)} → {fmt(self.current_states)}"
-        if accepting:
-            desc += " [MATCH]"
+        desc = self._format_states(prev, symbol, accepting)
         return self.current_states, accepting, desc
+    
+    def _format_states(self, prev: Set[ENFAState], symbol: str, accepting: bool) -> str:
+        """Format state transition description."""
+        fmt = lambda s: "{" + ", ".join(f"{st.phase}:{st.k}" for st in sorted(s, key=lambda x:(x.phase,x.k))) + "}"
+        desc = f"Read '{symbol}': {fmt(prev)} → {fmt(self.current_states)}"
+        return desc + " [MATCH]" if accepting else desc
 
     def get_state_description(self, state) -> str:
         if not state:

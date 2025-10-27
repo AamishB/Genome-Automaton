@@ -27,88 +27,71 @@ class DFA:
         # Build simple linear chain
         self._build_linear_chain()
 
-    # ----- Visualization adapter (finite automata) -----
     def get_type(self):
+        """Return automaton type for visualization."""
         return AutomataType.DFA
 
     def get_states(self):
-        # Q0 through Q(n-1) where n = pattern length
+        """Return all states in the automaton."""
         return list(range(len(self.pattern)))
 
     def get_initial_states(self):
+        """Return initial state set."""
         return {0}
 
     def get_accept_states(self):
-        # Q0 is the accept state (matches NFA style)
+        """Return accepting state set."""
         return {0}
 
     def get_current_states(self):
+        """Return current state set."""
         return {self.current_state}
 
     def get_transitions(self):
-        # Convert to nondet format: (state, symbol) -> set(next_states)
+        """Return transitions in nondeterministic format."""
         nd = {}
         for (s, sym), ns in self.transitions.items():
             nd.setdefault((s, sym), set()).add(ns)
         return nd
 
     def get_symbol_set(self):
+        """Return alphabet symbols."""
         return list(self.alphabet)
 
     def get_state_label(self, state):
+        """Return label for a state."""
         return f"Q{int(state)}"
     
     def get_important_restart_edges(self):
         """Mark the final return edge as important for visualization."""
-        if len(self.pattern) > 0:
-            last_state = len(self.pattern) - 1
-            last_symbol = self.pattern[-1]
-            return {(last_state, last_symbol)}
+        if self.pattern:
+            return {(len(self.pattern) - 1, self.pattern[-1])}
         return set()
     
     def _build_linear_chain(self):
-        """
-        Build a simple linear chain DFA:
-        Q0 --pattern[0]--> Q1 --pattern[1]--> Q2 ... Q(n-1) --pattern[n-1]--> Q0
-        
-        All non-matching edges loop back to Q0.
-        """
+        """Build a simple linear chain DFA."""
         n = len(self.pattern)
         
         if n == 0:
-            # Empty pattern: all edges self-loop at Q0
             for sym in self.alphabet:
                 self.transitions[(0, sym)] = 0
             return
         
-        # Build the main chain
         for i in range(n):
             current_char = self.pattern[i]
             
             for sym in self.alphabet:
                 if sym == current_char:
-                    if i == n - 1:
-                        # Last character: loop back to Q0 (accept and restart)
-                        self.transitions[(i, sym)] = 0
-                    else:
-                        # Advance to next state
-                        self.transitions[(i, sym)] = i + 1
+                    self.transitions[(i, sym)] = 0 if i == n - 1 else i + 1
                 else:
-                    # Non-matching symbol: check if it matches start of pattern
-                    if sym == self.pattern[0] and i != 0:
-                        # Start new potential match from Q1
-                        self.transitions[(i, sym)] = 1
-                    else:
-                        # Return to Q0
-                        self.transitions[(i, sym)] = 0
+                    self.transitions[(i, sym)] = 1 if sym == self.pattern[0] and i != 0 else 0
     
     def reset(self):
         """Reset automaton to initial state."""
         self.current_state = 0
     
     def step(self, symbol):
-        """
-        Process one input symbol and transition to next state.
+        """Process one input symbol and transition to next state.
         
         Args:
             symbol (str): DNA base to process
@@ -118,27 +101,28 @@ class DFA:
         """
         symbol = symbol.upper()
         old_state = self.current_state
+        is_match = False
         
         if symbol in self.alphabet:
             next_state = self.transitions.get((self.current_state, symbol), 0)
-            # Detect match: we're about to return to Q0 from the last state
             is_match = (self.current_state == len(self.pattern) - 1 and 
                        next_state == 0 and 
                        symbol == self.pattern[-1])
             self.current_state = next_state
-        else:
-            is_match = False
         
-        # Generate human-readable transition description
-        description = f"Read '{symbol}': Q{old_state} → Q{self.current_state}"
-        if is_match:
-            description += " [PATTERN MATCHED!]"
-        elif self.current_state > old_state:
-            description += f" (Matched {self.current_state}/{len(self.pattern)})"
-        elif self.current_state < old_state or (self.current_state == 0 and old_state != 0):
-            description += " (Reset/backtrack to start)"
-        
+        description = self._format_transition(old_state, symbol, is_match)
         return (self.current_state, is_match, description)
+    
+    def _format_transition(self, old_state, symbol, is_match):
+        """Format transition description for display."""
+        desc = f"Read '{symbol}': Q{old_state} → Q{self.current_state}"
+        if is_match:
+            desc += " [PATTERN MATCHED!]"
+        elif self.current_state > old_state:
+            desc += f" (Matched {self.current_state}/{len(self.pattern)})"
+        elif self.current_state < old_state or (self.current_state == 0 and old_state != 0):
+            desc += " (Reset/backtrack to start)"
+        return desc
     
     def get_state_description(self, state):
         """
