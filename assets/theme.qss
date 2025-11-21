@@ -1,137 +1,134 @@
-/* 
-Biotech Theme Stylesheet
-Dark background with neon accents (cyan/green)
+/*
+Smooth Dark Theme - Redesigned
+Calmer, muted dark background with soft accents and improved contrast.
+Primary accent: Soft teal (#5BC0BE). Secondary accent: Warm amber (#FFB479).
+Text: light cool gray for readability.
 */
 
 * {
-    color: #E0E0E0;
+    color: #E6EEF3;
 }
 
 QMainWindow {
-    background-color: #1A1F2E;
+    background-color: #071018;
 }
 
 QFrame {
-    background-color: #1A1F2E;
+    background-color: transparent;
     border: none;
 }
 
 /* Top Bar */
 #topBar {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #2A3F5F, stop:1 #1A2F4F);
-    border-bottom: 2px solid #00D9FF;
+                                stop:0 #0b2330, stop:1 #071218);
+    border-bottom: 1px solid #15303a;
 }
 
 #appTitle {
-    color: #00FFAA;
+    color: #CFF3EE;
 }
 
-/* Buttons */
+/* Buttons - base */
 QPushButton {
-    background-color: #2D3E5F;
-    color: #FFFFFF;
-    border: 2px solid #4A6FA5;
-    border-radius: 6px;
-    padding: 10px 20px;
+    background-color: #0E2A38;
+    color: #E6EEF3;
+    border: 1px solid #15363f;
+    border-radius: 8px;
+    padding: 8px 16px;
     font-size: 12px;
-    font-weight: bold;
 }
 
 QPushButton:hover {
-    background-color: #3D5080;
-    border-color: #00D9FF;
+    background-color: #153844;
+    border-color: #2a5960;
 }
 
 QPushButton:pressed {
-    background-color: #1D2E4F;
+    background-color: #0a2230;
 }
 
 QPushButton:disabled {
-    background-color: #1A1F2E;
-    color: #666666;
-    border-color: #333333;
+    background-color: #0b1114;
+    color: #6e7a81;
+    border-color: #0d171b;
 }
 
+/* Primary actions */
 #btnRun {
-    background-color: #00AA66;
-    border-color: #00FF88;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #69c5ba, stop:1 #5bc0be);
+    border-color: #4aa8a1;
+    color: #042024;
+    font-weight: 600;
 }
 
-#btnRun:hover {
-    background-color: #00CC77;
-}
+#btnRun:hover { background-color: #6fd7c9; }
 
 #btnPause {
-    background-color: #CC6600;
-    border-color: #FF8800;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffcfa0, stop:1 #ffb479);
+    border-color: #d89a5e;
+    color: #2a1408;
 }
 
-#btnPause:hover {
-    background-color: #DD7711;
-}
+#btnPause:hover { background-color: #ffd59a; }
 
 #btnReset {
-    background-color: #CC0033;
-    border-color: #FF3366;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f29aa8, stop:1 #e37d8c);
+    border-color: #d46b78;
+    color: #2a0e12;
 }
 
-#btnReset:hover {
-    background-color: #DD1144;
-}
+#btnReset:hover { background-color: #f48ca0; }
 
+/* Build / Generate buttons */
 #btnBuild {
-    background-color: #0088CC;
-    border-color: #00AAFF;
-    font-size: 14px;
-    font-weight: bold;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6f92ff, stop:1 #5d8bf6);
+    border-color: #446edc;
+    font-weight: 600;
 }
 
-#btnBuild:hover {
-    background-color: #0099DD;
-}
+#btnBuild:hover { background-color: #7ea0ff; }
 
 #btnGenerate {
-    background-color: #7733AA;
-    border-color: #9944CC;
-    font-size: 12px;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #9b82ff, stop:1 #8c6cf0);
+    border-color: #765bd8;
 }
 
-#btnGenerate:hover {
-    background-color: #8844BB;
-}
+#btnGenerate:hover { background-color: #a78fff; }
 
 #speedBtn {
-    padding: 8px 15px;
+    padding: 7px 12px;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 /* Panels */
 #leftPanel, #rightPanel {
-    background-color: #1F2937;
-    border: 1px solid #374151;
-    border-radius: 8px;
+    background-color: #071823;
+    border: 1px solid #13292f;
+    border-radius: 10px;
+    padding: 12px;
 }
 
 #centerPanel {
-    background-color: #161B26;
-    border: 1px solid #2A3F5F;
-    border-radius: 8px;
+    background-color: #061219;
+    border: 1px solid #0f2a33;
+    border-radius: 10px;
+    padding: 14px;
 }
 
 /* Input Fields */
 QLineEdit, QTextEdit {
-    background-color: #0F1419;
-    color: #FFFFFF;
-    border: 2px solid #2A4A6A;
-    border-radius: 5px;
+    background-color: #07121a;
+    color: #E6EEF3;
+    border: 1px solid #12313b;
+    border-radius: 6px;
     padding: 8px;
-    selection-background-color: #00AA66;
+    selection-background-color: #5BC0BE;
 }
 
 QLineEdit:focus, QTextEdit:focus {
-    border-color: #00D9FF;
+    border-color: #5BC0BE;
 }
 
 #dnaInput, #patternInput {
@@ -139,78 +136,79 @@ QLineEdit:focus, QTextEdit:focus {
 }
 
 #transitionLog, #resultsDisplay {
-    background-color: #0A0E14;
-    border: 1px solid #1A2A3A;
+    background-color: #051017;
+    border: 1px solid #0b2328;
     padding: 10px;
+    color: #cfe9ef;
 }
 
 /* Labels */
 QLabel {
-    color: #C0D0E0;
+    color: #cfe9ef;
 }
 
 #currentStateLabel {
-    background-color: #0F1920;
-    border: 2px solid #00D9FF;
-    border-radius: 6px;
+    background-color: #06151a;
+    border: 1px solid #5BC0BE;
+    border-radius: 8px;
     padding: 12px;
-    color: #00FFCC;
+    color: #DFF8F4;
     font-size: 13px;
 }
 
 #examplesLabel {
-    color: #8899AA;
-    background-color: #141923;
+    color: #9fb3bb;
+    background-color: #08161a;
     padding: 8px;
-    border-left: 3px solid #4488AA;
-    border-radius: 3px;
+    border-left: 3px solid #5BC0BE;
+    border-radius: 4px;
 }
 
 /* Footer */
 #footer {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #1A2F4F, stop:1 #0A1F3F);
-    border-top: 2px solid #00D9FF;
+                                stop:0 #071218, stop:1 #031116);
+    border-top: 1px solid #132a2f;
 }
 
 /* Visualization Widgets */
 #automataViz, #dnaViz {
-    background-color: #0D1117;
-    border: 2px solid #1F2937;
-    border-radius: 6px;
+    background-color: #041018;
+    border: 1px solid #0f2730;
+    border-radius: 8px;
 }
 
-/* Scrollbars */
+/* Scrollbars - subtle */
 QScrollBar:vertical {
-    background-color: #1A1F2E;
-    width: 12px;
+    background-color: transparent;
+    width: 10px;
     border-radius: 6px;
 }
 
 QScrollBar::handle:vertical {
-    background-color: #3A4F6F;
+    background-color: #113340;
     border-radius: 6px;
     min-height: 20px;
 }
 
 QScrollBar::handle:vertical:hover {
-    background-color: #4A6FA5;
+    background-color: #235b5c;
 }
 
 QScrollBar:horizontal {
-    background-color: #1A1F2E;
-    height: 12px;
+    background-color: transparent;
+    height: 10px;
     border-radius: 6px;
 }
 
 QScrollBar::handle:horizontal {
-    background-color: #3A4F6F;
+    background-color: #113340;
     border-radius: 6px;
     min-width: 20px;
 }
 
 QScrollBar::handle:horizontal:hover {
-    background-color: #4A6FA5;
+    background-color: #235b5c;
 }
 
 QScrollBar::add-line, QScrollBar::sub-line {
@@ -220,10 +218,10 @@ QScrollBar::add-line, QScrollBar::sub-line {
 
 /* Splitter */
 QSplitter::handle {
-    background-color: #2A3F5F;
+    background-color: #0f2a2f;
     width: 2px;
 }
 
 QSplitter::handle:hover {
-    background-color: #00D9FF;
+    background-color: #234f50;
 }
